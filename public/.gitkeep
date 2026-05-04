@@ -1,0 +1,2 @@
+# This file keeps the /public directory tracked by git
+# qr.png is generated at runtime and is in .gitignore
