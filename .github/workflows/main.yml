@@ -1,0 +1,209 @@
+# ==============================================================
+# GitHub Actions Workflow — WhatsApp AI Bot
+# ==============================================================
+# Trigger: Manual (workflow_dispatch)
+# Runner:  Ubuntu Latest
+# Purpose: Run WhatsApp bot with QR code display in logs
+#
+# ⚠️ EDUCATIONAL PROJECT ONLY
+# ⚠️ Runs are temporary (max ~6 hours on GitHub Actions)
+# ==============================================================
+
+name: 🤖 WhatsApp AI Bot
+
+on:
+  # Manual trigger only — go to Actions tab → Run workflow
+  workflow_dispatch:
+    inputs:
+      debug_mode:
+        description: 'Enable verbose debug logging'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+# Only allow one bot run at a time
+concurrency:
+  group: whatsapp-bot
+  cancel-in-progress: true
+
+jobs:
+  run-bot:
+    name: 🤖 Run WhatsApp Bot
+    runs-on: ubuntu-latest
+
+    # Timeout: GitHub Actions max is 6 hours (360 minutes)
+    timeout-minutes: 355
+
+    steps:
+
+      # ── Step 1: Checkout Repository ───────────────────────
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # ── Step 2: Setup Node.js ─────────────────────────────
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── Step 3: Install System Dependencies ───────────────
+      # Puppeteer (used by whatsapp-web.js) needs Chromium libs
+      - name: 🔧 Install Chromium Dependencies
+        run: |
+          echo "📦 Installing system dependencies for Puppeteer..."
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            chromium-browser \
+            chromium-chromedriver \
+            fonts-liberation \
+            fonts-noto-color-emoji \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2t64 \
+            xvfb 2>/dev/null || true
+          echo "✅ System dependencies installed"
+
+      # ── Step 4: Install Node Packages ─────────────────────
+      - name: 📦 Install Node.js Dependencies
+        run: |
+          echo "📦 Installing npm packages..."
+          npm install --prefer-offline 2>&1 | tail -20
+          echo "✅ npm packages installed"
+
+      # ── Step 5: Verify Setup ──────────────────────────────
+      - name: 🔍 Verify Setup
+        run: |
+          echo "🔍 Checking environment..."
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo ""
+
+          echo "📁 Project structure:"
+          ls -la
+
+          echo ""
+          echo "📦 Installed packages:"
+          ls node_modules | grep -E "(whatsapp|express|qrcode|axios|puppeteer)" || true
+
+          echo ""
+          echo "🖥️ Available Chromium:"
+          which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "Using puppeteer bundled chromium"
+
+      # ── Step 6: Create Required Directories ───────────────
+      - name: 📁 Create Required Directories
+        run: |
+          mkdir -p public
+          mkdir -p session
+          echo "✅ Directories created: /public, /session"
+
+      # ── Step 7: Display Bot Info ──────────────────────────
+      - name: 📋 Bot Information
+        run: |
+          echo "=============================================="
+          echo "🤖 WhatsApp AI Bot — Starting Up"
+          echo "=============================================="
+          echo "⏰ Started at: $(date)"
+          echo "🌍 Timezone: UTC"
+          echo "💻 Runner: ubuntu-latest"
+          echo "📦 Node: $(node --version)"
+          echo "=============================================="
+          echo ""
+          echo "📌 INSTRUCTIONS:"
+          echo "   1. Watch the logs below for the QR code"
+          echo "   2. Scan the QR code with WhatsApp"
+          echo "   3. Bot will start responding to messages"
+          echo ""
+          echo "⚠️  NOTE: This run expires in ~6 hours"
+          echo "⚠️  You must manually restart after expiry"
+          echo "=============================================="
+
+      # ── Step 8: Set Puppeteer Environment Variables ────────
+      - name: 🔧 Configure Puppeteer
+        run: |
+          # Try to use system chromium if available
+          CHROMIUM_PATH=$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "")
+
+          if [ -n "$CHROMIUM_PATH" ]; then
+            echo "Using system Chromium at: $CHROMIUM_PATH"
+            echo "PUPPETEER_EXECUTABLE_PATH=$CHROMIUM_PATH" >> $GITHUB_ENV
+            echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
+          else
+            echo "Using Puppeteer bundled Chromium"
+          fi
+
+          # Display settings for headless
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      # ── Step 9: Start Virtual Display ─────────────────────
+      - name: 🖥️ Start Virtual Display (Xvfb)
+        run: |
+          Xvfb :99 -screen 0 1280x720x24 -nolisten tcp &
+          sleep 2
+          echo "✅ Virtual display started"
+
+      # ── Step 10: Run the Bot ──────────────────────────────
+      # This is the main step — runs until workflow times out
+      - name: 🚀 Run WhatsApp AI Bot
+        env:
+          NODE_ENV: production
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+          # Debug mode from workflow input
+          DEBUG: ${{ github.event.inputs.debug_mode == 'true' && 'puppeteer:*' || '' }}
+        run: |
+          echo "🚀 Starting WhatsApp AI Bot..."
+          echo "📱 Watch for QR code in the logs below..."
+          echo "=============================================="
+          echo ""
+
+          # Run the bot
+          # Using 'node index.js' with output streaming
+          node index.js 2>&1
+
+      # ── Step 11: Upload Session (if bot connected) ────────
+      # This preserves session so you might not need to re-scan
+      - name: 💾 Upload Session Data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: whatsapp-session-${{ github.run_number }}
+          path: |
+            session/
+            !session/**/*.log
+          retention-days: 1
+          if-no-files-found: ignore
+
+      # ── Step 12: Upload QR Image ──────────────────────────
+      - name: 📸 Upload QR Image (if generated)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qr-code-${{ github.run_number }}
+          path: public/qr.png
+          retention-days: 1
+          if-no-files-found: ignore
+
+      # ── Step 13: Completion Summary ───────────────────────
+      - name: 📊 Run Summary
+        if: always()
+        run: |
+          echo "=============================================="
+          echo "📊 Bot Run Summary"
+          echo "=============================================="
+          echo "⏰ Ended at: $(date)"
+          echo "🔢 Run number: ${{ github.run_number }}"
+          echo ""
+          echo "To restart the bot:"
+          echo "  1. Go to Actions tab in your repository"
+          echo "  2. Click 'WhatsApp AI Bot' workflow"
+          echo "  3. Click 'Run workflow' button"
+          echo "=============================================="
