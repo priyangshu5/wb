@@ -1,0 +1,532 @@
+/* ============================================================
+   STYLE.CSS — WhatsApp Bot QR Viewer Styles
+   Mobile-first, full-screen, dark theme
+   ============================================================ */
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Color palette */
+  --bg-primary:       #0a0a0a;
+  --bg-secondary:     #111111;
+  --bg-card:          #1a1a1a;
+  --bg-card-hover:    #222222;
+
+  --accent-green:     #25D366;
+  --accent-green-dark:#128C7E;
+  --accent-green-glow:rgba(37, 211, 102, 0.3);
+
+  --text-primary:     #ffffff;
+  --text-secondary:   #aaaaaa;
+  --text-muted:       #666666;
+
+  --border-color:     #2a2a2a;
+  --border-accent:    #25D366;
+
+  --shadow-glow:      0 0 30px rgba(37, 211, 102, 0.2);
+  --shadow-card:      0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Sizing */
+  --qr-size:          min(80vw, 80vh, 360px);
+  --border-radius:    16px;
+  --border-radius-sm: 8px;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Oxygen, Ubuntu, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport for mobile */
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* ── Utility ────────────────────────────────────────────────── */
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: block !important;
+}
+
+/* ── Main Container ─────────────────────────────────────────── */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0 16px 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 1.6rem;
+}
+
+.logo-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Status badge */
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s ease;
+}
+
+.badge-dot.waiting    { background: #f59e0b; animation: pulse-dot 1.5s infinite; }
+.badge-dot.ready      { background: var(--accent-green); }
+.badge-dot.connected  { background: var(--accent-green); animation: pulse-dot 2s infinite; }
+.badge-dot.error      { background: #ef4444; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── QR Section ─────────────────────────────────────────────── */
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+}
+
+/* Instructions */
+.instructions {
+  text-align: center;
+  padding: 0 8px;
+}
+
+.title {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  font-size: clamp(0.8rem, 3vw, 0.95rem);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* ── QR Wrapper ─────────────────────────────────────────────── */
+
+.qr-wrapper {
+  position: relative;
+  width: var(--qr-size);
+  height: var(--qr-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animated glowing ring around QR */
+.qr-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--border-radius) + 4px);
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark), transparent, var(--accent-green));
+  background-size: 300% 300%;
+  animation: ring-rotate 3s linear infinite;
+  opacity: 0.8;
+  z-index: 0;
+}
+
+@keyframes ring-rotate {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* QR Frame (white background card) */
+.qr-frame {
+  position: relative;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  background: #ffffff;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+/* QR Image */
+.qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: calc(var(--border-radius) - 4px);
+  transition: opacity 0.4s ease;
+}
+
+.qr-image.fade-in {
+  animation: fade-in 0.4s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── QR Placeholder (loading state) ────────────────────────── */
+
+.qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+  border-radius: calc(var(--border-radius) - 4px);
+}
+
+.placeholder-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.placeholder-sub {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Spinner */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(37, 211, 102, 0.2);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Status Message ─────────────────────────────────────────── */
+
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px 16px;
+}
+
+/* ── Refresh Info ───────────────────────────────────────────── */
+
+.refresh-info {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.countdown {
+  font-weight: 700;
+  color: var(--accent-green);
+  font-size: 0.9rem;
+}
+
+/* ── Help Section ───────────────────────────────────────────── */
+
+.help-section {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.help-details {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.help-summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.help-summary:hover {
+  background: var(--bg-card-hover);
+}
+
+.help-summary::-webkit-details-marker {
+  display: none;
+}
+
+.help-content {
+  padding: 4px 16px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Steps list */
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.step-num {
+  min-width: 24px;
+  height: 24px;
+  background: var(--accent-green);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+.footer p {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.footer strong {
+  color: var(--accent-green);
+}
+
+/* ── Connected Overlay ──────────────────────────────────────── */
+
+.connected-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: overlay-in 0.4s ease;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.connected-card {
+  background: var(--bg-card);
+  border: 2px solid var(--accent-green);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 0 60px var(--accent-green-glow);
+  animation: card-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes card-in {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.connected-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.connected-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  margin-bottom: 12px;
+}
+
+.connected-sub {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.connected-pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 26px;
+  border: 2px solid var(--accent-green);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+/* ── Responsive Adjustments ─────────────────────────────────── */
+
+/* Small phones */
+@media (max-width: 380px) {
+  :root {
+    --qr-size: 75vw;
+  }
+  .title { font-size: 1.2rem; }
+  .subtitle { font-size: 0.78rem; }
+}
+
+/* Landscape mode */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --qr-size: min(55vh, 55vw);
+  }
+
+  .container {
+    padding-top: 8px;
+  }
+
+  .header {
+    margin-bottom: 12px;
+  }
+
+  .instructions {
+    display: none; /* Hide instructions in landscape to save space */
+  }
+
+  .qr-section {
+    gap: 12px;
+  }
+}
+
+/* Tablets and larger */
+@media (min-width: 600px) {
+  :root {
+    --qr-size: 340px;
+  }
+
+  .container {
+    padding: 0 24px 32px;
+  }
+
+  .title { font-size: 2rem; }
+  .subtitle { font-size: 1rem; }
+}
+
+/* ── Dark mode (already dark, but ensure media query) ───────── */
+@media (prefers-color-scheme: dark) {
+  /* Already dark theme — no changes needed */
+}
+
+/* ── Accessibility ──────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .qr-ring,
+  .spinner,
+  .badge-dot,
+  .connected-pulse {
+    animation: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+summary:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+}

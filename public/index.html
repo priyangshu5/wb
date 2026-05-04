@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ======================================================
+       WhatsApp AI Bot — QR Viewer
+       Full-screen, mobile-friendly QR code display
+       ====================================================== -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <title>📱 WhatsApp Bot — QR Scanner</title>
+
+  <!-- Favicon (WhatsApp green) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ── Main Container ──────────────────────────────────── -->
+  <div class="container" id="mainContainer">
+
+    <!-- ── Header ─────────────────────────────────────────── -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">💬</span>
+        <span class="logo-text">WhatsApp AI Bot</span>
+      </div>
+      <div class="badge" id="statusBadge">
+        <span class="badge-dot" id="statusDot"></span>
+        <span class="badge-text" id="statusText">Connecting...</span>
+      </div>
+    </header>
+
+    <!-- ── QR Section ─────────────────────────────────────── -->
+    <main class="qr-section">
+
+      <!-- Instructions -->
+      <div class="instructions" id="instructions">
+        <h1 class="title">Scan to Connect</h1>
+        <p class="subtitle">
+          Open WhatsApp → Linked Devices → Link a Device → Scan this code
+        </p>
+      </div>
+
+      <!-- QR Image Container -->
+      <div class="qr-wrapper" id="qrWrapper">
+
+        <!-- Animated border ring -->
+        <div class="qr-ring"></div>
+
+        <!-- The QR image itself -->
+        <div class="qr-frame">
+          <img
+            id="qrImage"
+            src=""
+            alt="WhatsApp QR Code"
+            class="qr-image hidden"
+          />
+
+          <!-- Placeholder shown while QR loads -->
+          <div class="qr-placeholder" id="qrPlaceholder">
+            <div class="spinner"></div>
+            <p class="placeholder-text">Generating QR...</p>
+            <p class="placeholder-sub">Please wait a moment</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Status message below QR -->
+      <div class="status-message" id="statusMessage">
+        <span id="statusIcon">⏳</span>
+        <span id="statusLabel">Waiting for QR code...</span>
+      </div>
+
+      <!-- Refresh countdown -->
+      <div class="refresh-info" id="refreshInfo">
+        <span>🔄 Auto-refreshing in </span>
+        <span id="countdown" class="countdown">6</span>
+        <span> seconds</span>
+      </div>
+
+    </main>
+
+    <!-- ── Help Section ───────────────────────────────────── -->
+    <section class="help-section">
+      <details class="help-details">
+        <summary class="help-summary">
+          <span>📖 How to scan? (tap to expand)</span>
+        </summary>
+        <div class="help-content">
+          <ol class="steps">
+            <li>
+              <span class="step-num">1</span>
+              <span>Open <strong>WhatsApp</strong> on your phone</span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span>Tap the <strong>3-dot menu</strong> (Android) or <strong>Settings</strong> (iPhone)</span>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <span>Select <strong>"Linked Devices"</strong></span>
+            </li>
+            <li>
+              <span class="step-num">4</span>
+              <span>Tap <strong>"Link a Device"</strong></span>
+            </li>
+            <li>
+              <span class="step-num">5</span>
+              <span>Point your camera at this QR code</span>
+            </li>
+          </ol>
+        </div>
+      </details>
+    </section>
+
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer class="footer">
+      <p>⚠️ Educational project only — not for production use</p>
+      <p>Powered by <strong>OpenRouter AI</strong> + <strong>WhatsApp Web</strong></p>
+    </footer>
+
+  </div>
+
+  <!-- ── Connected Overlay (shown after bot connects) ──── -->
+  <div class="connected-overlay hidden" id="connectedOverlay">
+    <div class="connected-card">
+      <div class="connected-icon">✅</div>
+      <h2 class="connected-title">Bot Connected!</h2>
+      <p class="connected-sub">
+        Your WhatsApp AI bot is now active.<br />
+        Send any message to test it!
+      </p>
+      <div class="connected-pulse"></div>
+    </div>
+  </div>
+
+  <!-- ── JavaScript ─────────────────────────────────────── -->
+  <script src="script.js"></script>
+
+</body>
+</html>
