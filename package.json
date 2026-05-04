@@ -1,0 +1,29 @@
+{
+  "name": "whatsapp-ai-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp AI Chatbot with QR Web Viewer - Educational Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "qr-server": "node qr-server.js"
+  },
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode": "^1.5.3",
+    "express": "^4.18.2",
+    "axios": "^1.6.2",
+    "puppeteer": "^21.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "ai",
+    "chatbot",
+    "educational"
+  ],
+  "author": "Student Project",
+  "license": "MIT"
+}
